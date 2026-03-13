@@ -1,36 +1,39 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
-import { useSelector } from '../../services/store';
+import { useDispatch, useSelector } from '../../services/store';
 import { selectIngredients } from '../../services/slices/ingredientSlice';
 import { selectFeed } from '../../services/slices/feedSlice';
 import {
-  selectOrderData,
-  selectOrderModalData
+  fetchOrderByNumber,
+  selectCurrentOrder,
+  selectOrderData
 } from '../../services/slices/orderSlice';
 import { useParams } from 'react-router-dom';
+import styles from '../ui/order-info/order-info.module.css';
 
 export const OrderInfo: FC = () => {
   const { number } = useParams<{ number: string }>();
-  const orderModalData = useSelector(selectOrderModalData);
+  const dispatch = useDispatch();
+
   const feedData = useSelector(selectFeed);
   const userOrders = useSelector(selectOrderData);
+  const currentOrder = useSelector(selectCurrentOrder);
   const ingredients = useSelector(selectIngredients);
 
-  let orderData = orderModalData;
+  const orderNumber = Number(number);
 
-  if (!orderData && number) {
-    const orderNumber = Number(number);
+  const orderData =
+    feedData?.orders.find((order) => order.number === orderNumber) ||
+    userOrders.find((order) => order.number === orderNumber) ||
+    currentOrder;
 
-    orderData =
-      feedData?.orders.find((order) => order.number === orderNumber) || null;
-
-    if (!orderData) {
-      orderData =
-        userOrders.find((order) => order.number === orderNumber) || null;
+  useEffect(() => {
+    if (number && !orderData) {
+      dispatch(fetchOrderByNumber(orderNumber));
     }
-  }
+  }, [dispatch, number, orderData, orderNumber]);
 
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
@@ -77,5 +80,12 @@ export const OrderInfo: FC = () => {
     return <Preloader />;
   }
 
-  return <OrderInfoUI orderInfo={orderInfo} />;
+  return (
+    <>
+      <p className={`text text_type_digits-default mb-10 ${styles.number}`}>
+        #{number}
+      </p>
+      <OrderInfoUI orderInfo={orderInfo} />
+    </>
+  );
 };

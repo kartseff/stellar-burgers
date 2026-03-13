@@ -1,4 +1,4 @@
-import { getOrdersApi, orderBurgerApi } from '@api';
+import { getOrderByNumberApi, getOrdersApi, orderBurgerApi } from '@api';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { TOrder } from '@utils-types';
 import { RootState } from '../store';
@@ -13,7 +13,7 @@ interface OrdersState {
   order: TOrder[];
   isLoading: boolean;
   error: string | null;
-
+  currentOrder: TOrder | null;
   orderRequest: boolean;
   orderModalData: TOrder | null;
 }
@@ -22,7 +22,7 @@ const initialState: OrdersState = {
   order: [],
   isLoading: true,
   error: null,
-
+  currentOrder: null,
   orderRequest: false,
   orderModalData: null
 };
@@ -35,6 +35,19 @@ export const fetchOrders = createAsyncThunk<TOrder[]>(
 export const createOrder = createAsyncThunk<TCreateOrderResponse, string[]>(
   'order/createOrder',
   async (ingredients) => orderBurgerApi(ingredients)
+);
+
+export const fetchOrderByNumber = createAsyncThunk<TOrder, number>(
+  'order/fetchOrderByNumber',
+  async (number) => {
+    const data = await getOrderByNumberApi(number);
+
+    if (!data.success || !data.orders.length) {
+      throw new Error('Заказ не найден');
+    }
+
+    return data.orders[0];
+  }
 );
 
 export const orderSlice = createSlice({
@@ -75,6 +88,21 @@ export const orderSlice = createSlice({
         state.error = action.error.message ?? 'Error';
         state.orderRequest = false;
       });
+
+    builder
+      .addCase(fetchOrderByNumber.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.currentOrder = null;
+      })
+      .addCase(fetchOrderByNumber.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.currentOrder = action.payload;
+      })
+      .addCase(fetchOrderByNumber.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message ?? 'Error';
+      });
   }
 });
 
@@ -85,3 +113,5 @@ export const selectOrderModalData = (state: RootState) =>
   state.order.orderModalData;
 export const selectOrderData = (state: RootState) => state.order.order;
 export const { clearOrderModal } = orderSlice.actions;
+export const selectCurrentOrder = (state: RootState) =>
+  state.order.currentOrder;

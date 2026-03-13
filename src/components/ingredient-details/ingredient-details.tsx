@@ -1,24 +1,17 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { Preloader } from '../ui/preloader';
 import { IngredientDetailsUI } from '../ui/ingredient-details';
 import { useSelector } from '../../services/store';
 import { useParams } from 'react-router-dom';
-import {
-  fetchIngredients,
-  selectIngredients
-} from '../../services/slices/ingredientSlice';
-import { useDispatch } from '../../services/store';
+import { selectIngredients } from '../../services/slices/ingredientSlice';
 
 export const IngredientDetails: FC = () => {
-  const dispatch = useDispatch();
   const ingredients = useSelector(selectIngredients);
   const { id } = useParams<{ id: string }>();
 
-  useEffect(() => {
-    if (!ingredients.length) {
-      dispatch(fetchIngredients());
-    }
-  }, [dispatch]);
+  if (!ingredients.length) {
+    return <Preloader />;
+  }
 
   const ingredientData = ingredients.find((item) => item._id === id);
 
@@ -26,5 +19,12 @@ export const IngredientDetails: FC = () => {
     return <Preloader />;
   }
 
-  return <IngredientDetailsUI ingredientData={ingredientData} />;
+  return (
+    <>
+      <h2 className='text text_type_main-large mt-10 mb-5'>
+        Детали ингредиента
+      </h2>
+      <IngredientDetailsUI ingredientData={ingredientData} />
+    </>
+  );
 };
