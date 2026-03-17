@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TConstructorIngredient, TIngredient } from '@utils-types';
 import { RootState } from '../store';
 import { v4 as uuid } from 'uuid';
+import { createOrder } from './orderSlice';
 
 interface ConstructorState {
   bun: TIngredient | null;
@@ -37,12 +38,40 @@ export const constructorSlice = createSlice({
 
     removeIngredient(state, action: PayloadAction<number>) {
       state.ingredients.splice(action.payload, 1);
+    },
+
+    moveIngredient(
+      state,
+      action: PayloadAction<{ index: number; direction: 'up' | 'down' }>
+    ) {
+      const { index, direction } = action.payload;
+      const newIndex = direction === 'up' ? index - 1 : index + 1;
+
+      if (
+        newIndex < 0 ||
+        newIndex >= state.ingredients.length ||
+        index < 0 ||
+        index >= state.ingredients.length
+      ) {
+        return;
+      }
+
+      [state.ingredients[index], state.ingredients[newIndex]] = [
+        state.ingredients[newIndex],
+        state.ingredients[index]
+      ];
     }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(createOrder.fulfilled, (state) => {
+      state.bun = null;
+      state.ingredients = [];
+    });
   }
 });
 
 export const constructorReducer = constructorSlice.reducer;
 export const selectConstructorItems = (state: RootState) =>
   state.burgerConstructor;
-export const { removeIngredient } = constructorSlice.actions;
-export const { addIngredient } = constructorSlice.actions;
+export const { removeIngredient, addIngredient, moveIngredient } =
+  constructorSlice.actions;
