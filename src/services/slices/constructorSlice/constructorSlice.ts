@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TConstructorIngredient, TIngredient } from '@utils-types';
-import { RootState } from '../store';
+import { RootState } from '../../store';
 import { v4 as uuid } from 'uuid';
-import { createOrder } from './orderSlice';
+import { createOrder } from '../orderSlice/orderSlice';
 
 interface ConstructorState {
   bun: TIngredient | null;
