@@ -3,13 +3,13 @@ import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
 import { useDispatch, useSelector } from '../../services/store';
-import { selectIngredients } from '../../services/slices/ingredientSlice';
-import { selectFeed } from '../../services/slices/feedSlice';
+import { selectIngredients } from '../../services/slices/ingredientSlice/ingredientSlice';
+import { selectFeed } from '../../services/slices/feedSlice/feedSlice';
 import {
   fetchOrderByNumber,
   selectCurrentOrder,
   selectOrderData
-} from '../../services/slices/orderSlice';
+} from '../../services/slices/orderSlice/orderSlice';
 import { useParams } from 'react-router-dom';
 import styles from '../ui/order-info/order-info.module.css';
 

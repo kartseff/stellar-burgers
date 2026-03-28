@@ -7,8 +7,8 @@ import { ModalUI } from '@ui';
 import { ProtectedRoute } from '../../utils/protected-route';
 import { useDispatch } from '../../services/store';
 import { useEffect } from 'react';
-import { fetchUser } from '../../services/slices/userSlice';
-import { fetchIngredients } from '../../services/slices/ingredientSlice';
+import { fetchUser } from '../../services/slices/userSlice/userSlice';
+import { fetchIngredients } from '../../services/slices/ingredientSlice/ingredientSlice';
 
 import {
   ConstructorPage,
