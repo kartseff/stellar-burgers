@@ -1,15 +1,25 @@
 import { useSelector } from '../../services/store';
-
 import styles from './constructor-page.module.css';
-
 import { BurgerIngredients } from '../../components';
 import { BurgerConstructor } from '../../components';
 import { Preloader } from '../../components/ui';
 import { FC } from 'react';
+import {
+  isIngredientLoading,
+  ingredientError
+} from '../../services/slices/ingredientSlice';
 
 export const ConstructorPage: FC = () => {
-  /** TODO: взять переменную из стора */
-  const isIngredientsLoading = false;
+  const isIngredientsLoading = useSelector(isIngredientLoading);
+  const error = useSelector(ingredientError);
+
+  if (error) {
+    return (
+      <p className='text text_type_main-large mt-10 text_type_main-default text_color_error'>
+        Ошибка: {error}
+      </p>
+    );
+  }
 
   return (
     <>

@@ -1,7 +1,8 @@
 import { FC } from 'react';
-
 import { TOrder } from '@utils-types';
 import { FeedInfoUI } from '../ui/feed-info';
+import { useSelector } from '../../services/store';
+import { selectFeed } from '../../services/slices/feedSlice';
 
 const getOrders = (orders: TOrder[], status: string): number[] =>
   orders
@@ -10,9 +11,11 @@ const getOrders = (orders: TOrder[], status: string): number[] =>
     .slice(0, 20);
 
 export const FeedInfo: FC = () => {
-  /** TODO: взять переменные из стора */
-  const orders: TOrder[] = [];
-  const feed = {};
+  const feed = useSelector(selectFeed);
+
+  const orders = feed?.orders ?? [];
+  const total = feed?.total ?? 0;
+  const totalToday = feed?.totalToday ?? 0;
 
   const readyOrders = getOrders(orders, 'done');
 
@@ -22,7 +25,10 @@ export const FeedInfo: FC = () => {
     <FeedInfoUI
       readyOrders={readyOrders}
       pendingOrders={pendingOrders}
-      feed={feed}
+      feed={{
+        total,
+        totalToday
+      }}
     />
   );
 };
